@@ -43,7 +43,7 @@ public class SecurityConfig {
                     //登录方法
                     .requestMatchers("/login").permitAll()
                     //静态页面
-                    .requestMatchers("/tcdt/**").permitAll()
+                    .requestMatchers("/demo_antd/**").permitAll()
                     //下载相关
                     .requestMatchers("/billForm/generate").permitAll()
                     .requestMatchers("/component/generateFull").permitAll()
@@ -71,7 +71,7 @@ public class SecurityConfig {
                     //登录方法
                     .authorizeHttpRequests().requestMatchers("/login").permitAll()
                     //静态页面
-                    .requestMatchers("/tcdt/**").permitAll()
+                    .requestMatchers("/demo_antd/**").permitAll()
                     .requestMatchers("/**").permitAll()
                     .and().logout().logoutUrl("/logout")
                     .addLogoutHandler(new TokenLogoutHandler(tokenManager))

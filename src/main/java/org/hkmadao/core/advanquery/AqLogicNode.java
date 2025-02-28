@@ -3,9 +3,11 @@ package org.hkmadao.core.advanquery;
 import org.hkmadao.core.base.BaseEntity;
 import org.hkmadao.core.advanquery.operators.comparison.OperatorFactor;
 import org.hkmadao.core.advanquery.operators.comparison.IOperator;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import jakarta.persistence.criteria.*;
+
 import java.util.*;
 
 /**
@@ -70,7 +72,7 @@ public class AqLogicNode {
                                                                        Root<T> root,
                                                                        CriteriaBuilder criteriaBuilder,
                                                                        AqLogicNode aqLogicNode) {
-        if (Objects.isNull(aqLogicNode) || !StringUtils.hasLength(aqLogicNode.getLogicOperatorCode())) {
+        if (Objects.isNull(aqLogicNode) || !StringUtils.hasLength(aqLogicNode.getLogicOperatorCode()) || CollectionUtils.isEmpty(aqLogicNode.getFilterNodes())) {
             return new ArrayList<>();
         }
         List<Predicate> predicates = new ArrayList<>();
@@ -81,15 +83,14 @@ public class AqLogicNode {
                 }
         );
 
-        if (Objects.nonNull(aqLogicNode.getLogicNode())) {
+        if (Objects.nonNull(aqLogicNode.getLogicNode()) && !aqLogicNode.getLogicNode().getFilterNodes().isEmpty()) {
             //子查询条件
-            List<Predicate> predicates1 = recursionNode(joinMap, root, criteriaBuilder, aqLogicNode.getLogicNode());
-            predicates.addAll(predicates1);
+            recursionNode(joinMap, root, criteriaBuilder, aqLogicNode.getLogicNode());
         }
 
         if (AqLogicNode.AND.equals(aqLogicNode.getLogicOperatorCode())) {
-            return Arrays.asList(criteriaBuilder.and(predicates.toArray(new Predicate[]{})));
+            return Collections.singletonList(criteriaBuilder.and(predicates.toArray(new Predicate[]{})));
         }
-        return Arrays.asList(criteriaBuilder.or(predicates.toArray(new Predicate[]{})));
+        return Collections.singletonList(criteriaBuilder.or(predicates.toArray(new Predicate[]{})));
     }
 }
